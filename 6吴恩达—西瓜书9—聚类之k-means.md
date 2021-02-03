@@ -442,69 +442,87 @@ plt.show()
 
 
 
+- - ## 6.聚类k-means
 
+     ```python
+     sklearn.cluster.KMeans
+     (n_clusters=8, *, init='k-means++', n_init=10, max_iter=300, tol=0.0001, precompute_distances='deprecated', verbose=0, random_state=None, copy_x=True, n_jobs='deprecated', algorithm='auto')
+     ```
 
-- **slearn**
+     - **方法**
+       - **n_clusters ： int, default=8**
+         - 簇的数量，默认是8
+       - **init ： {‘k-means++’, ‘random’}, callable or array-like of shape (n_clusters, n_features), default=’k-means++’**
+         - 初始化簇的方法
+         - ‘k-means++’：能够加快收敛速度，选择的质心极可能的分散
+         -  ‘random’ ： 从初始质心随机选择进行观察
+         - 如果传递了数组，则其形状应为（n_clusters，n_features），并给出初始中心
+         - 如果传递了callable，则应使用参数X，n_clusters和随机状态并返回初始化。
+       - **n_init ：int, default=10**
+         - 用不同的质心初始化值运行算法的次数，最终解是在inertia意义下选出的最优结果。
+       - **max_iter*****int, default=300**
+         - 最大迭代次数，默认300
+       - **precompute_distances*****{‘auto’, True, False}, default=’auto’**
+         - 预计算距离（更快，但占用更多内存）
+           - 'auto'：如果n_samples * n_clusters> 1200万，则不预先计算距离。使用双精度，这相当于每个作业大约100MB的开销。
+           - True始终预先计算距离。
+           - False：永远不要预先计算距离。
+           - 这个参数*0.23版*开始不推荐使用*：* 'precompute_distances'在0.22版中不再推荐使用，并将在1.0版中删除（重新命名0.25版）。没有作用
+       - **verbose ： int, default=0**
+         - 默认为0,冗余模式
+       - **random_state ：int, RandomState instance or None, default=None**
+         - 如果是int，则random_state是随机数生成器使用的种子; 
+         - 如果是RandomState实例，则random_state是随机数生成器; 
+         - 如果为None，则随机数生成器是np.random使用的RandomState实例。
+       - **copy_x ： bool, default=True**
+         - True:对输入训练数据x所做的任何操作都是对x.copy()进行的，不改变x的原值
+         - False:对x的操作会同步到x上，原地修改
+       - **n_jobsint, default=None**
+         - 并行运行的个数。-1:使用所有CPU.
+       - **algorithm*****{“auto”, “full”, “elkan”}, default=”auto”**
+         - auto:自动选择，数据稀疏选择，保持向后兼容性会选择“ elkan”
+         - full：采用经典的EM算法模式，数据稠密
+         - elkan:通过使用三角不等式从而更有效，但不支持稀疏数据
+     - **属性**
+       - **cluster_centers_ndarray of shape (n_clusters, n_features)**
+         - 簇质心的坐标
+       - **labels_ ：ndarray of shape (n_samples,)**
+         - 样本的标签
+       - **inertia_ :  float**
+         - 样本到其最近的聚类中心的平方距离
+       - **n_iter_  : int**
+         - 运行的迭代次数
 
-- **sklearn.cluster.KMeans**(algorithm='auto',        copy_x=True,   init='k-means++',                  max_iter=300,
-      n_clusters=16,                            n_init=100,                 n_jobs=-1, precompute_distances='auto',
-      random_state=None,              tol=0.0001,                 verbose=0)
+     - 方法**
+       - **fit(*X*, *y*, *sample_weight=None*)**
+         - 训练分类器模型
+       - **fit_predict(X,y)**
+         - 训练模拟器并预测每个样本的聚类
+       - **fit_transform(X,y)**
+         - 拟合并且把X映射到聚类空间，返回的是距离
+       - **transform(X）**
+         - 把X转换到聚类空间，返回的是距离
+       - **get_params(deep=True)**
+         - deep ： bool 默认为True
+         - 返回字典，估计器的各个设置参数
+       - **predict（X）**
+         - 用估计其预测X，得到预测值
+       - **score(X,y,sample_weight)：**
+         - 返回（X，y）上的的平均准确度
+       - **set_params()**
+         - 该估计其的设置
 
-  
+     - **备注**
 
-- 
+     使用Lloyd或Elkan算法可以解决k-均值问题。
 
-  - **n_clusters**：整形，缺省值=8 生成的聚类数，即产生的质心（centroids）数。
-  - **max_iter**：整形，缺省值=300
-    执行一次k-means算法所进行的最大迭代数。
-  - **n_init**：整形，缺省值=10
-    用不同的质心初始化值运行算法的次数，最终解是在inertia意义下选出的最优结果。
-  - **init**：有三个可选值：’k-means++’， ‘random’，或者传递一个ndarray向量。
-    此参数指定初始化方法，默认值为 ‘k-means++’。
-    （１）‘k-means++’ 用一种特殊的方法选定初始质心从而能加速迭代过程的收敛。k-means++算法选择初始seeds的基本思想就是：初始的聚类中心之间的相互距离要尽可能的远。
-    （２）‘random’ 随机从训练数据中选取初始质心。
-    （３）如果传递的是一个ndarray，则应该形如 (n_clusters,n_features) 并给出初始质心。
-  - **precompute_distances**：三个可选值，‘auto’，True 或者 False。
-    预计算距离，计算速度更快但占用更多内存。
-    （１）‘auto’：如果 样本数乘以聚类数大于 12million 的话则不预计算距离。
-    （２）True：总是预先计算距离。
-    （３）False：永远不预先计算距离。
-  - **tol**：float形，默认值= 1e-4　与inertia结合来确定收敛条件。
-  - **n_jobs**：整形数。　指定计算所用的进程数。内部原理是同时进行n_init指定次数的计算。
-    （１）若值为 -1，则用所有的CPU进行运算。若值为1，则不进行并行运算，这样的话方便调试。
-    （２）若值小于-1，则用到的CPU数为(n_cpus + 1 + n_jobs)。因此如果 n_jobs值为-2，则用到的CPU数为总CPU数减1。
-  - **random_state**：整形或 numpy.RandomState 类型，可选
-    用于初始化质心的生成器（generator）。如果值为一个整数，则确定一个seed。此参数默认值为numpy的随机数生成器。
-  - **copy_x**：布尔型，默认值=True
-    当我们precomputing distances时，将数据中心化会得到更准确的结果。如果把此参数值设为True，则原始数据不会被改变。如果是False，则会直接在原始数据
-    上做修改并在函数返回值时将其还原。但是在计算过程中由于有对数据均值的加减运算，所以数据返回后，原始数据和计算前可能会有细小差别。
+     平均复杂度由O（kn T）给出，其中n是样本数，T是迭代数。
 
+     最坏情况下的复杂度由O（n ^（k + 2 / p））给出，其中n = n_samples，p = n_features。
 
+     实际上，k-means算法非常快（是可用的最快的聚类算法之一），但它属于局部最小值。这就是为什么多次重新启动它会很有用。
 
-
-
-- **属性：**
-  - **cluster_centers**_：向量，[n_clusters, n_features] (聚类中心的坐标)_
-  - **labels_**: 每个点的分类
-  - **inertia_**：float形
-
-- **方法**
-  - **fit(X[,y])**:
-    　计算k-means聚类。
-  - **fit_predictt(X[,y]):**
-    　计算簇质心并给每个样本预测类别。
-  - **fit_transform(X[,y])**：
-    计算簇并 transform X to cluster-distance space。
-  - **get_params([deep])：**
-    　取得估计器的参数。
-  - **predict(X):predict(X)**
-    　给每个样本估计最接近的簇。
-  - **score(X[,y]):**
-    　计算聚类误差
-  - **set_params(**params):**
-    　为这个估计器手动设定参数。
-  - **transform(X[,y]): 将X转换为群集距离空间。**
-    　在新空间中，每个维度都是到集群中心的距离。 请注意，即使X是稀疏的，转换返回的数组通常也是密集的。
+     如果算法在完全收敛之前停止（由于`tol`或 `max_iter`），`labels_`并且`cluster_centers_`会不一致，即，`cluster_centers_`它将不是每个聚类中点的均值。同样，估算器将`labels_`在最后一次迭代后重新分配，以`labels_`与`predict`训练集保持一致。
 - 压缩图片
 
 ```python

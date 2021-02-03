@@ -1,5 +1,9 @@
 # KNN
 
+[TOC]
+
+
+
 ## 1.k近邻算法
 
 - **近邻** (k-Nearest Neighbor,  简称 kNN) 
@@ -54,6 +58,16 @@ k 近邻学习与前面的学习有一个很大的**不同之处**:  $k$ 近邻�
   - 当p→∞时，就是切比雪夫距离。
 
 ![](./images/闵氏距离.png)
+
+- **闵可夫斯基距离(Minkowski Distance)**的几何图形
+
+  - 其实和范数形式是一样的
+
+  ![](./images/闵可夫斯基距离.png)
+
+
+
+
 
 ## 3.参数k的重要性
 
@@ -156,16 +170,13 @@ kd树(K-dimension tree)是**一种对k维空间中的实例点进行存储以便
 ## 6.代码接口
 
 - **sklearn.neighbors.KNeighborsClassifier(n_neighbors=5, weights='uniform', algorithm='auto', leaf_size=30, p=2, metric='minkowski', metric_params=None, n_jobs=None, kwargs)**
-
   - **n_neighbors：**int,可选（默认= 5），k_neighbors查询默认使用的邻居数
-
   - **weights：**预测的权函数，概率值**。**
 
     -  ‘uniform’：同一的权重，即每个邻域中的所有点都是平均加权的。
     -  ‘distance’ ：这种情况下，距离越近权重越大，反之，距离越远其权重越小。
 
     -  [callable]（可调用）：用户定义的函数，它接受一个距离数组，并返回一个包含权重的相同形状的数组
-
   - **algorithm ：**用于计算最近邻居的算法,。有{‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’}
 
     -  ‘auto’      ：根据样本数据自动刷选合适的算法。
@@ -175,16 +186,25 @@ kd树(K-dimension tree)是**一种对k维空间中的实例点进行存储以便
     -  ‘kd_tree’ ：‘’kd树‘’算法。
 
     - ‘brute’     ：使用蛮力搜索，即或相当于Knn算法，需遍历所有样本数据与目标数据的距离，进而按升序排序从而选取最近的K个值，采用投票得出结果。
-
   - **leaf_size：**叶的大小，针对算法为球树或KD树而言。这个设置会影响构造和查询的速度，以及存储树所需的内存。最优值取决于问题的性质。
-
   - **metric：**用于树的距离度量。默认度量是Minkowski，p=2等价于标准的欧几里德度量。有关可用度量的列表，可以查阅距离度量类的文档。如果度量是“预先计算的”，则假定X是距离矩阵，在拟合期间必须是平方。
-
   - **p：**Minkowski度量参数的参数来自sklearn.emeics.pairwise.pairwise_距离。当p=1时，这等价于使用曼哈顿距离(L1)，欧几里得距离(L2)等价于p=2时，对于任意的p，则使用Minkowski_距离(L_P)。
-
   - **metric_params：**度量函数的附加关键字参数，设置应为dict（字典）形式。
-
   - **n_jobs：**要为邻居搜索的并行作业的数量。`None`指1，除非在 joblib.parallel_backend背景。`-1`意味着使用所有处理器，若要了解相关的知识应该具体查找一下。
+
+
+
+- **属性**
+
+  - **classes_***形状的数组（n_classes，）*分类器已知的类标签
+
+  - **effective_metric_**使用的距离度量。与`metric`参数或其同义词相同，例如，如果`metric`参数设置为“ minkowski”且`p`参数设置为2，则为“ euclidean” 。
+
+  - **effective_metric_params_***字典*度量功能的其他关键字参数。对于大多数指标，`metric_params`参数将与参数相同，但`p`如果`effective_metric_`属性设置为“ minkowski” ，则也可能包含 参数值。
+
+  - **n_samples_fit_** *int*拟合数据中的样本数。
+
+  - **outputs_2d**：`y`在拟合期间当形状为（n_samples，）或（n_samples，1）时为False，否则为True。
 
 **方法：**
 

@@ -201,7 +201,7 @@ SVM的代价函数为
   - 软间隔的意思就是在满足约束条件时，我们给一个松弛的损失，可以允许它不等于0
   - **松弛变量ξ > =0**
 
-![](./images/软间隔.svg)
+![](./images/软间隔.png)
 
 上式所述问题即软间隔支持向量机。软间隔可以解决那些界面模糊不清，寻找最大间隔艰难的分类情况，让最大间隔边界允许犯一小点错误。
 
@@ -373,128 +373,353 @@ SVM的求解和优化太tm难了所以我强烈建议你直接调库！。
 
 ## sklearn
 
-自己写太复杂了，建议直接调库
+- - ## 5.支持向量机SVM
 
-- 线性SVM
+    sklearn的SVM分为 SVC支持向量分类和SVR支持向量回归，同时还有简单的线性分类和线性回归
 
-- **svm=Sklearn.svm.LinearSVC(*penalty=’l2’*, *loss=’squared_hinge’*, *dual=True*, *tol=0.0001*, *C=1.0*, *multi_class=’ovr’*,*fit_intercept=True*, *intercept_scaling=1*, *class_weight=None*, *verbose=0*, *random_state=None*, *max_iter=1000*)**
+    ### 5.1 linearSVC 线性SVC分类
 
-  - **penalty** : string, ‘l1’ or ‘l2’ (default=’l2’)
+    ```python
+    sklearn.svm.LinearSVC
+    (penalty='l2', loss='squared_hinge', *, dual=True, tol=0.0001, C=1.0, multi_class='ovr', fit_intercept=True, intercept_scaling=1, class_weight=None, verbose=0, random_state=None, max_iter=1000)
+    ```
 
-    指定惩罚中使用的规范。 'l2'惩罚是SVC中使用的标准。 'l1'导致稀疏的coef_向量。
+    - **参数**
 
-  - **loss** : string, ‘hinge’ or ‘squared_hinge’ (default=’squared_hinge’)
+      - **penalty** : string, ‘l1’ or ‘l2’ (default=’l2’)
 
-    指定损失函数。 “hinge”是标准的SVM损失（例如由SVC类使用），而“squared_hinge”是hinge损失的平方。
+        默认值为“ l2”，这是线性SVM模型的标准正则化器。“ l1”和“ elasticnet”可能会给模型带来稀疏性（功能选择），而“ l2”是无法实现的。
 
-  - **dual** : bool, (default=True)
+        - **“ l2”** L2正则化
+        - **‘l1’** L1正则化
+        - **‘elasticnet’** L1和L2的联合
 
-    选择算法以解决双优化或原始优化问题。 当n_samples> n_features时，首选dual = False。
+      - **loss** : string, ‘hinge’ or ‘squared_hinge’ (default=’squared_hinge’)
 
-  - **tol** : float, optional (default=1e-4)
+        指定损失函数。
 
-    公差停止标准
+        -  “hinge”是标准的SVM损失（例如由SVC类使用）
+        - “squared_hinge”是hinge损失的平方。
 
-  - **C** : float, optional (default=1.0)
+      - **dual** : bool, (default=True)
 
-    错误项的惩罚参数
+        选择算法以解决双优化或原始优化问题。 当n_samples> n_features时，首选dual = False。
 
-  - **multi_class** : string, ‘ovr’ or ‘crammer_singer’ (default=’ovr’)
+      - **tol** : float, optional (default=1e-4)
 
-    如果y包含两个以上的类，则确定多类策略。 “ovr”训练n_classes one-vs-rest分类器，而“crammer_singer”优化所有类的联合目标。 虽然crammer_singer在理论上是有趣的，因为它是一致的，但它在实践中很少使用，因为它很少能够提高准确性并且计算成本更高。 如果选择“crammer_singer”，则将忽略选项loss，penalty和dual。
+        迭代精度停止阈值
 
-  - **fit_intercept** : boolean, optional (default=True)
+      - **C** : float, optional (default=1.0)
 
-    是否计算此模型的截距。 如果设置为false，则不会在计算中使用截距（即，预期数据已经居中）。
+        常规项的参数，正则化参数的倒数。正则化的强度与C成反比。必须严格为正
 
-  - **intercept_scaling** : float, optional (default=1)
+      - **multi_class** : string, ‘ovr’ or ‘crammer_singer’ (default=’ovr’)
 
-    当self.fit_intercept为True时，实例向量x变为[x，self.intercept_scaling]，即具有等于intercept_scaling的常量值的“合成”特征被附加到实例向量。 截距变为intercept_scaling *合成特征权重注意！ 合成特征权重与所有其他特征一样经受l1 / l2正则化。 为了减小正则化对合成特征权重（并因此对截距）的影响，必须增加intercept_scaling。
+        如果y包含两个以上的类，则确定多类策略。 
 
-  - **class_weight** : {dict, ‘balanced’}, optional
+        - “ovr”训练n_classes one-vs-rest分类器，
+        - 而“crammer_singer”优化所有类的联合目标。 虽然crammer_singer在理论上是有趣的，因为它是一致的，但它在实践中很少使用，因为它很少能够提高准确性并且计算成本更高。 如果选择“crammer_singer”，则将忽略选项loss，penalty和dual。
 
-    将类i的参数C设置为SVC的class_weight [i] * C. 如果没有给出，所有课程都应该有一个重量。 “平衡”模式使用y的值自动调整与输入数据中的类频率成反比的权重，如n_samples /（n_classes * np.bincount（y））
+      - **fit_intercept** : boolean, optional (default=True)
 
-  - **verbose** : int, (default=0)
+        是否计算此模型的截距。 如果设置为false，则不会在计算中使用截距（即，预期数据已经居中）。
 
-    启用详细输出。 请注意，此设置利用liblinear中的每进程运行时设置，如果启用，可能无法在多线程上下文中正常工作。
+      - **intercept_scaling ：float, default=1**
 
-  - **random_state** : int, RandomState instance or None, optional (default=None)
+        - 仅在正则化项为‘liblinear’，且fit_intercept设置为True时有用。
+        - 变为[x，self.intercept_scaling]，即，将常量值等于intercept_scaling的“合成”特征附加到实例矢量。截距变为。intercept_scaling * synthetic_feature_weight
 
-    在随机数据混洗时使用的伪随机数生成器的种子。 如果是int，则random_state是随机数生成器使用的种子; 如果是RandomState实例，则random_state是随机数生成器; 如果为None，则随机数生成器是np.random使用的RandomState实例。
+      - **class_weight :dict or ‘balanced’, default=None**
 
-  - **max_iter** : int, (default=1000)
+        - 与形式的类有关的权重。如果未给出，则所有类均应具有权重。`{class_label: weight}`
+        - “balanced”模式使用y的值来自动调整与输入数据中的类频率成反比的权重。`n_samples / (n_classes * np.bincount(y))`
+        - 请注意，如果指定了sample_weight，则这些权重将与sample_weight（通过fit方法传递）相乘。
 
-    要运行的最大迭代次数。
+      - **verbose** : int, (default=0)
 
-- **方法**
+        启用详细输出。 请注意，此设置利用liblinear中的每进程运行时设置，如果启用，可能无法在多线程上下文中正常工作。
 
-![](./images/svmlinear方法.png)
+      - **random_state** : int, RandomState instance or None, optional (default=None)
 
-```python
-	import numpy as np
-import pandas as pd
-import sklearn.svm
-import seaborn as sns
-import scipy.io as sio
-import matplotlib.pyplot as plt
+        控制伪随机数生成，以对双坐标下降（如果`dual=True`）进行数据混排。当`dual=False`的基础实现`LinearSVC`不是随机的并且 `random_state`对结果没有影响时
 
-mat = sio.loadmat('./data/ex6data1.mat')
-print(mat.keys())
-data = pd.DataFrame(mat.get('X'), columns=['X1', 'X2'])
-data['y'] = mat.get('y')
-# c = 1
-svc1 = sklearn.svm.LinearSVC(C=1, loss='hinge')
-svc1.fit(data[['X1', 'X2']], data['y'])
-svc1.score(data[['X1', 'X2']], data['y'])
-# c = 100
-svc100 = sklearn.svm.LinearSVC(C=100, loss='hinge')
-svc100.fit(data[['X1', 'X2']], data['y'])
-svc100.score(data[['X1', 'X2']], data['y'])
-```
+        -  如果是int，则random_state是随机数生成器使用的种子; 
+        - 如果是RandomState实例，则random_state是随机数生成器; 
+        - 如果为None，则随机数生成器是np.random使用的RandomState实例。
 
+      - **max_iter** : int, (default=1000)
 
+        要运行的最大迭代次数。
 
+    - **属性**
 
+      - **coef_***形状为（1，n_features）的ndarray如果n_classes == 2 else（n_classes，n_features）*
+        - 训练器的系数。仅在线性内核的情况下可用。
 
-- **非线性SVM**
+      - **intercept_** *ndarray形状（1），如果n_classes == 2别的（n_classes，）*
+        - 截距
+      - **classes_***形状的ndarray（n_classes，）*
+        - 分类的的类标签。
 
-- **svm =sklearn.svm.SVC(C=1.0,       kernel='rbf',       degree=3, gamma='auto',         coef0=0.0,         shrinking=True, probability=False,           tol=0.001,         cache_size=200, class_weight=None,            verbose=False,           max_iter=-1, decision_function_shape=None,random_state=None)**
-  - **C**：C-SVC的惩罚参数C?默认值是1.0
-    C越大，相当于惩罚松弛变量，希望松弛变量接近0，即对误分类的惩罚增大，趋向于对训练集全分对的情况，这样对训练集测试时准确率很高，但泛化能力弱。C值小，对误分类的惩罚减小，允许容错，将他们当成噪声点，泛化能力较强。
-  - **kerne** ：核函数，默认是rbf，可以是‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’
-    – 线性：u’v
-    – 多项式：(gamma*u’*v + coef0)^degree– RBF函数：exp(-gamma|u-v|^2)–sigmoid：tanh(gamma*u’*v + coef0)
-  - **degree** ：多项式poly函数的维度，默认是3，选择其他核函数时会被忽略。
-  - **gamma** ： ‘rbf’,‘poly’ 和‘sigmoid’的核函数参数。默认是’auto’，则会选择1/n_features
-  - **coef0** ：核函数的常数项。对于‘poly’和 ‘sigmoid’有用。
-  - **probability** ：是否采用概率估计.默认为False
-    **布尔类型，可选，默认为False**
-    决定是否启用概率估计。需要在训练fit()模型时加上这个参数，之后才能用相关的方法：predict_proba和predict_log_proba
-  - **shrinking** ：是否采用shrinking heuristic方法，默认为true
-  - **tol** ：停止训练的误差值大小，默认为1e-3
-  - **cache_size** ：核函数cache缓存大小，默认为200
-  - **class_weight** ：类别的权重，字典形式传递。设置第几类的参数C为weight*C(C-SVC中的C)
-  - **verbose** ：允许冗余输出？
-  - **max_iter** ：最大迭代次数。-1为无限制。
-  - **decision_function_shape** ：‘ovo’, ‘ovr’ or None, default=None3
-  - **random_state** ：数据洗牌时的种子值，int值
+      - **n_iter_** *int*
+        - 所有类的最大迭代次数。
 
+    - **方法**
 
+      - **decision_function(X)**：
+        - 对样本预测置信度得分
+        - 二分类时候， 概率>0则为分类为1
+      - **densify（）**
+        - 将系数矩阵转换为密集阵列格式。
+      - **fit(*X*, *y*, *sample_weight=None*)**
+        - 训练分类器模型
+      - **get_params(deep=True)**
+        - deep ： bool 默认为True
+        - 返回字典，估计器的各个设置参数
+      - **predict（X）**
+        - 用估计其预测X，得到预测值
+      - **score(X,y,sample_weight)：**
+        - 返回（X，y）上的的平均准确度
+      - **sparsify()**：
+        - 将系数矩阵转换为稀疏格式。
+      - **set_params()**
+        - 该估计其的设置
 
-- **SVC的方法**
+    
 
-  1、**fit()**方法：用于训练SVM，具体参数已经在定义SVC对象的时候给出了，这时候只需要给出数据集X和X对应的标签y即可。
+    
 
-  2、**predict()**方法：基于以上的训练，对预测样本T进行类别预测，因此只需要接收一个测试集T，该函数返回一个数组表示个测试样本的类别。
+    ### 5.2 SVC支持向量分类（可以做非线性）
 
-  3、**predict_proba()**：返回每个输入类别的概率，这与predict方法不同，predict方法返回的输入样本属于那个类别，但没有概率。使用此方法时，需要在初始化时，将 probability参数设置为True。
+    ```python
+    sklearn.svm.SVC
+    (*, C=1.0, kernel='rbf', degree=3, gamma='scale', coef0=0.0, shrinking=True, probability=False, tol=0.001, cache_size=200, class_weight=None, verbose=False, max_iter=- 1, decision_function_shape='ovr', break_ties=False, random_state=None)
+    ```
 
-- **属性**
+    - **参数**
 
-  - **vc.n_support**_：各类各有多少个支持向量_
-  - **svc.support_**：各类的支持向量在训练样本中的索引
-  - **svc.support_vectors_**：各类所有的支持向量
+      - **C**：***float, default=1.0***默认值是1.0
+
+        - 常规项系数，正则系数的倒数。
+        - C越大，相当于惩罚松弛变量，希望松弛变量接近0，即对误分类的惩罚增大，趋向于对训练集全分对的情况，这样对训练集测试时准确率很高，但泛化能力弱。
+        - C值小，对误分类的惩罚减小，允许容错，将他们当成噪声点，泛化能力较强。
+
+      - **kernel** ：***{‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’}, default=’rbf’***
+
+        - 核函数，默认是rbf，
+        - ‘linear’:线性核函数
+        - ‘poly’：多项式核函数
+
+        - ‘rbf’：径像核函数/高斯核
+
+        - ‘sigmod’:sigmod核函数
+
+        - ‘precomputed’:核矩阵，precomputed表示自己提前计算好核函数矩阵，这时候算法内部就不再用核函数去计算核矩阵，而是直接用你给的核矩阵
+
+      - **degree** ：***int, default=3***
+
+        - 多项式poly函数的维度，默认是3，选择其他核函数时会被忽略。
+
+      - **gamma** ：***{‘scale’, ‘auto’} or float, default=’scale’***
+
+        -  ‘rbf’,‘poly’ 和‘sigmoid’的核函数参数。
+          - auto’，则会选择1/n_features
+          - 'scale'：默认值，1 / (n_features * X.var())作为参数
+
+      - **coef0** ：***float, default=0.0***
+
+        - 核函数的常数项。对于‘poly’和 ‘sigmoid’有用。
+
+      - **probability** ：***bool, default=False***
+
+        - 是否采用概率估计.默认为False
+          决定是否启用概率估计。需要在训练fit()模型时加上这个参数，之后才能用相关的方法：predict_proba和predict_log_proba
+
+      - **shrinking** ：***bool, default=True***
+
+        - 是否采用shrinking heuristic方法，默认为true
+
+      - **tol** ：***float, default=1e-3***
+
+        - 停止训练的误差值大小，默认为1e-3
+
+      - **cache_size** ：***float, default=200***
+
+        - 核函数cache缓存大小，默认为200
+
+      - **class_weight :dict or ‘balanced’, default=None**
+
+        - 与形式的类有关的权重。如果未给出，则所有类均应具有权重。`{class_label: weight}`
+        - “balanced”模式使用y的值来自动调整与输入数据中的类频率成反比的权重。`n_samples / (n_classes * np.bincount(y))`
+        - 请注意，如果指定了sample_weight，则这些权重将与sample_weight（通过fit方法传递）相乘。
+
+      - **verbose** : int, (default=0)
+
+        启用详细输出。 请注意，此设置利用liblinear中的每进程运行时设置，如果启用，可能无法在多线程上下文中正常工作。
+
+      - **max_iter** ：
+
+        - 最大迭代次数。-1为无限制。
+
+      - **decision_function_shape** ：‘ovo’, ‘ovr’ or None, default=None3
+
+        - ’ovr‘决策函数one-vs-rest，shape (n_samples, n_classes) 
+        - one-vs-one (‘ovo’)决策函数(n_samples, n_classes *(n_classes - 1) / 2). ，始终将OVO用作多类别策略，如果为二分类则忽视该设置
+
+      - **random_state** : int, RandomState instance or None, optional (default=None)
+
+        控制伪随机数生成，当`probability`为False时被忽略，为True时才被弃用
+
+        -  如果是int，则random_state是随机数生成器使用的种子; 
+        - 如果是RandomState实例，则random_state是随机数生成器; 
+        - 如果为None，则随机数生成器是np.random使用的RandomState实例。
+
+      - **break_ties  ：bool，默认= False**
+
+        - 如果为真，`decision_function_shape='ovr'`以及类> 2， predict将根据置信值打破僵局 decision_function 否则，将返回绑定类中的第一类。请注意，与简单预测相比，打破平局的计算成本较高。
+
+    
+
+    - **属性**
+      - **class_weight_： ndarray of shape (n_classes,)**
+        - 每个类的参数C，根据class_weight确定
+      - **classes_ : ndarray of shape (n_classes,)**
+        - 分类的标签
+      - **coef_ : ndarray of shape (n_classes \* (n_classes - 1) / 2, n_features)**
+        - 训练器的系数，只在线性内核的时候有效
+      - **dual_coef_ : ndarray of shape (n_classes -1, n_SV)**
+        - 决策函数中支持向量的对偶系数
+      - **fit_status_ ： int**
+        - 如果正确拟合，则为0，否则为1
+      - **intercept_ ： ndarray of shape (n_classes \* (n_classes - 1) / 2,)**
+        - 决策函数中的截距
+      - **support_ : ndarray of shape (n_SV)**
+        - 支持向量的索引
+      - **support_vectors_ : ndarray of shape (n_SV, n_features)**
+        - 各类的所有支持向量
+      - **n_support_ : ndarray of shape (n_classes,), dtype=int32**
+        - 各类有多少个支持向量
+      - **probA_ ：  ndarray of shape (n_classes \* (n_classes - 1) / 2)**
+      - **probB_： ndarray of shape (n_classes \* (n_classes - 1) / 2)**
+        -  `probability=True`, 才能输出，False时为空数组
+        -  `1 / (1 + exp(decision_value * probA_ + probB_))` 
+      - **shape_fit_  ：tuple of int of shape (n_dimensions_of_X,)**
+        - 训练向量X的维度
+    - **方法**
+      - **decision_function(X)**：
+        - 对样本预测置信度得分
+        - 二分类时候， 概率>0则为分类为1
+      - **fit(*X*, *y*, *sample_weight=None*)**
+        - 训练分类器模型
+      - **get_params(deep=True)**
+        - deep ： bool 默认为True
+        - 返回字典，估计器的各个设置参数
+      - **predict（X）**
+        - 用估计其预测X，得到预测值
+      - **score(X,y,sample_weight)：**
+        - 返回（X，y）上的的平均准确度
+      - **set_params()**
+        - 该估计其的设置
+
+    ## 5.3 SVR支持向量回归
+
+    ```python
+    sklearn.svm.SVR
+    (*, kernel='rbf', degree=3, gamma='scale', coef0=0.0, tol=0.001, C=1.0, epsilon=0.1, shrinking=True, cache_size=200, verbose=False, max_iter=- 1)
+    ```
+
+    - **参数**
+
+      - **kernel** ：***{‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’}, default=’rbf’***
+
+        - 核函数，默认是rbf，
+        - ‘linear’:线性核函数
+        - ‘poly’：多项式核函数
+
+        - ‘rbf’：径像核函数/高斯核
+
+        - ‘sigmod’:sigmod核函数
+
+        - ‘precomputed’:核矩阵，precomputed表示自己提前计算好核函数矩阵，这时候算法内部就不再用核函数去计算核矩阵，而是直接用你给的核矩阵
+
+      - **degree** ：***int, default=3***
+
+        - 多项式poly函数的维度，默认是3，选择其他核函数时会被忽略。
+
+      - **gamma** ：***{‘scale’, ‘auto’} or float, default=’scale’***
+
+        -  ‘rbf’,‘poly’ 和‘sigmoid’的核函数参数。
+          - auto’，则会选择1/n_features
+          - 'scale'：默认值，1 / (n_features * X.var())作为参数
+
+      - **coef0** ：***float, default=0.0***
+
+        - 核函数的常数项。对于‘poly’和 ‘sigmoid’有用。
+
+      - **C**：***float, default=1.0***默认值是1.0
+
+        - 常规项系数，正则系数的倒数。
+        - C越大，相当于惩罚松弛变量，希望松弛变量接近0，即对误分类的惩罚增大，趋向于对训练集全分对的情况，这样对训练集测试时准确率很高，但泛化能力弱。
+        - C值小，对误分类的惩罚减小，允许容错，将他们当成噪声点，泛化能力较强。
+
+      - **epsilon ：float, default=0.1**
+
+        - 松弛系数，svr回归的间隔带（在间隔带内不计算损失）
+
+      - **shrinking** ：***bool, default=True***
+
+        - 是否采用shrinking heuristic方法，默认为true
+
+      - **tol** ：***float, default=1e-3***
+
+        - 停止训练的误差值大小，默认为1e-3
+
+      - **verbose** : int, (default=0)
+
+        启用详细输出。 请注意，此设置利用liblinear中的每进程运行时设置，如果启用，可能无法在多线程上下文中正常工作。
+
+      - **max_iter** ：
+
+        - 最大迭代次数。-1为无限制。
+
+      - **cache_size** ：***float, default=200***
+
+        - 核函数cache缓存大小，默认为200
+
+        
+
+    - **属性**
+
+      - **class_weight_： ndarray of shape (n_classes,)**
+        - 每个类的参数C，根据class_weight确定
+      - **coef_ : ndarray of shape (n_classes \* (n_classes - 1) / 2, n_features)**
+        - 训练器的系数，只在线性内核的时候有效
+      - **dual_coef_ : ndarray of shape (n_classes -1, n_SV)**
+        - 决策函数中支持向量的对偶系数
+      - **fit_status_ ： int**
+        - 如果正确拟合，则为0，否则为1
+      - **intercept_ ： ndarray of shape (n_classes \* (n_classes - 1) / 2,)**
+        - 决策函数中的截距
+      - **n_support_ : ndarray of shape (n_classes,), dtype=int32**
+        - 各类有多少个支持向量
+      - **shape_fit_  ：tuple of int of shape (n_dimensions_of_X,)**
+        - 训练向量X的维度
+      - **support_vectors_： ndarray of shape (n_SV, n_features)**
+        - 支持向量
+
+    - **方法**
+
+      - **fit(*X*, *y*, *sample_weight=None*)**
+        - 训练分类器模型
+      - **get_params(deep=True)**
+        - deep ： bool 默认为True
+        - 返回字典，估计器的各个设置参数
+      - **predict（X）**
+        - 用估计其预测X，得到预测值
+      - **score(X,y,sample_weight)：**
+        - 返回（X，y）的准确度R^2^
+      - **set_params()**
+        - 该估计其的设置
 
 ```python
 import matplotlib.pyplot as plt
