@@ -6,3 +6,4 @@
 
 吴恩达老师机器学习视频，笔记为https://github.com/fengdu78/Coursera-ML-AndrewNg-Notes  黄海光博士整理在其笔记基础上自己总结~
 周志华《机器学习》公式推导推荐看https://github.com/datawhalechina/pumpkin-book，  笔记推荐  https://github.com/familyld/Machine_Learning/ ~
+新增了自己翻译总结的常用sklearn 的APi 参数 属性，方法中文介绍
